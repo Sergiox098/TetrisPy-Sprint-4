@@ -174,6 +174,7 @@ def play():
     
     def game():
         results=Pgame.maingame()
+        print(results)
         score = results[0]
         code = results[1]
         level = results[2]
@@ -515,16 +516,10 @@ def opciones():
         pack_widget(del_cuenta_frame)
             
 mj_frame = tk.Frame(menu, bg="#0f0f0f")
-
 mj_play_btn = tk.Button(mj_frame, text="Jugar", font=psp14, fg="white", bg="#0f0f0f",command=play)
 mj_stats_btn = tk.Button(mj_frame, text="Estadísticas", font=psp14, fg="white", bg="#0f0f0f", command=stats)
-
 mj_top_5_btn = tk.Button(mj_frame, text="Top 5", font=psp14, fg="white", bg="#0f0f0f",command=top5)
-
 mj_options_btn = tk.Button(mj_frame, text="Opciones", font=psp14, command=opciones, fg="white", bg="#0f0f0f")
-
 mj_return_btn = tk.Button(mj_frame, text="Salir", font=psp14, command=lambda:return_btn(mj_frame, menu_start), fg="white", bg="#0f0f0f")
-
-
 
 menu.mainloop()

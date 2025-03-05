@@ -1,6 +1,5 @@
 import pygame
 import random
-import sys
 
 WIDTH, HEIGHT = 1200, 650 
 GRID_SIZE = 30
@@ -179,12 +178,14 @@ def draw_info(screen, score, lines_cleared, elapsed_time, level, errors, availab
     drop_text = font.render("Enter : Soltar pieza", True, WHITE)
     change_text = font.render("E : Cambiar palabra", True, WHITE)
     menu_text = font.render("ESC : Volver al menú", True, WHITE)
+    exit_text =font.render("F1 : Salir del juego", True, WHITE)
     
     screen.blit(move_text, (GRID_WIDTH + 30, word_y + 90))
     screen.blit(down_text, (GRID_WIDTH + 30, word_y + 120))
     screen.blit(drop_text, (GRID_WIDTH + 30, word_y + 150))
     screen.blit(change_text, (GRID_WIDTH + 30, word_y + 180))
     screen.blit(menu_text, (GRID_WIDTH + 30, word_y + 210))
+    screen.blit(exit_text, (GRID_WIDTH + 30, word_y + 240))
 
 def draw_message(screen, message, color, font, y_offset=0):
     text_surface = font.render(message, True, color)
@@ -237,6 +238,7 @@ def draw_main_menu(screen, font_large, font_medium, font_small):
     controls_drop = font_small.render("Enter : Soltar pieza", True, WHITE)
     controls_change = font_small.render("E : Cambiar palabra", True, WHITE)
     controls_menu = font_small.render("ESC : Volver al menú", True, WHITE)
+    controls_escape = font_small.render("F1 : Salir de la partida", True, WHITE)
     
     title_rect = title.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 100))
     subtitle_rect = subtitle.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 40))
@@ -248,6 +250,7 @@ def draw_main_menu(screen, font_large, font_medium, font_small):
     controls_drop_rect = controls_drop.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 220))
     controls_change_rect = controls_change.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 250))
     controls_menu_rect = controls_menu.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 280))
+    controls_escape_rect = controls_escape.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 310))
     
     screen.blit(title, title_rect)
     screen.blit(subtitle, subtitle_rect)
@@ -258,6 +261,7 @@ def draw_main_menu(screen, font_large, font_medium, font_small):
     screen.blit(controls_drop, controls_drop_rect)
     screen.blit(controls_change, controls_change_rect)
     screen.blit(controls_menu, controls_menu_rect)
+    screen.blit(controls_escape, controls_escape_rect)
 
 def get_fall_speed(level):
     return max(BASE_FALL_SPEED - (level * SPEED_INCREASE_PER_LEVEL), 200)
@@ -339,6 +343,7 @@ def maingame():
                 error_text = font_small.render(f"Has cometido {errors} errores de {MAX_ERRORS} permitidos.", True, WHITE)
                 score_text = font_small.render(f"Puntaje final: {score} | Tiempo: {elapsed_time:.1f}s", True, WHITE)
                 restart_text = font_small.render("Presiona ESPACIO para reiniciar", True, GREEN)
+                exit_text = font_small.render("Presiona ESC para volver al menú", True, WHITE)
                 exit_text = font_small.render("Presiona ESC para volver al menú", True, WHITE)
                 
                 error_rect = error_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 20))
@@ -492,8 +497,15 @@ def maingame():
         pygame.display.flip()
         clock.tick(30)
     
+    results = [score, lines_cleared, level, elapsed_time]
+    resultsmax = [0,0,0,0]
+    
+    if results > resultsmax:
+        resultsmax = results
+    
     pygame.quit()
-    return [score, lines_cleared, level, elapsed_time]
-
+    
+    return resultsmax
+    
 if __name__ == "__main__":
-    print(maingame())
+    maingame()
