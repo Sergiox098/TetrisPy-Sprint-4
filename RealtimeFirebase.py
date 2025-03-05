@@ -57,33 +57,71 @@ def puntaje(x,y):
             existing_users = {}
         for key,u in existing_users.items():
             if u['Nombre de Usuario'] == x:
-                usersref.child(key).update({
-                    "Puntaje máximo alcanzado": y
-                })
-                succes = True
-                return succes
+                if u['Puntaje máximo alcanzado'] < y:
+                    usersref.child(key).update({
+                        "Puntaje máximo alcanzado": y
+                    })
+                    return True
+                else:
+                    return 0
         
 def nivel(x,y):
-        print("Esta sección del menú es para que ingreses el nivel máximo obtenido")
         existing_users = usersref.get()
         if existing_users is None:
             existing_users = {}
         for key,u in existing_users.items():
             if u['Nombre de Usuario'] == x:
-                usersref.child(key).update({
-                    "Nivel más alto": y
-                })
-        print("El nivel ha sido registrado en la cuenta:",x)
+                if u['Nivel más alto'] < y:
+                    usersref.child(key).update({
+                        "Nivel más alto": y
+                    })
+                    return True
+                else:
+                    return 0
+
 def codigo(x,y):
         existing_users = usersref.get()
         if existing_users is None:
             existing_users = {}
         for key,u in existing_users.items():
             if u['Nombre de Usuario'] == x:
+                if u["Máximo de códigos realizados"] < y:
+                    usersref.child(key).update({
+                        "Máximo de códigos realizados": y
+                    })
+                    return True
+                else:
+                    return 0
+def tiempo(x,y):
+    existing_users = usersref.get()
+    if existing_users is None:
+        existing_users = {}
+    for key,u in existing_users.items():
+        if u['Nombre de Usuario'] == x:
+            if u['Tiempo de partida'] < y:
                 usersref.child(key).update({
-                    "Máximo de códigos realizados": y
+                    "Tiempo de partida": y
                 })
-        print("El máximo de códigos realizados ha sido registrado en la cuenta:",x)
+                return True
+            else:
+                return 0
+
+def getscore(x):
+    existing_users = usersref.get()
+    if existing_users is None:
+        existing_users = {}
+    for key,u in existing_users.items():
+        if u['Nombre de Usuario'] == x:
+            scores=usersref.child(key).get()
+            scorelist = [
+                scores["Puntaje máximo alcanzado"],
+                scores["Nivel más alto"],
+                scores["Máximo de códigos realizados"],
+                scores["Tiempo de partida"]
+            ]
+            return scorelist
+   
+    
 def topleaderboard():
     leaderboard = usersref.get()
     list_top=[]
@@ -91,38 +129,26 @@ def topleaderboard():
     if leaderboard is None:
         leaderboard = {}
     for i in leaderboard.values():
-        topscore=i['Puntaje máximo alcanzado']
-        topuser=i['Nombre de Usuario']
-        top=(topuser,topscore)
+        topscore=str(i['Puntaje máximo alcanzado'])
+        topuser=str(i['Nombre de Usuario'])
+        toplevel=str(i['Nivel más alto'])
+        topmaxcode=str(i['Máximo de códigos realizados'])
+        toptime=str(i['Tiempo de partida'])
+        top=(topuser,topscore,toplevel,topmaxcode,toptime)
         list_top.append(top)
     list_top.sort(key = lambda x: x[1],reverse=True)
     cont = 0
+    list_top5 = []
     while cont < len(list_top):
-        print(cont+1,list_top[cont])
+        list_top5.append(list_top[cont])
         cont += 1
-        if  cont == 4:
-            break
-def deleteaccount(y,z,p):
-    p=str(p)
-    success = False
-    usersdata = usersref.get()
-    if usersdata is None:
-        usersdata = {}
-    for key,value in usersdata.items():
-        print(value)
-        if value["Correo Electrónico"] == y and value["Contraseña"] == z:
-            print(f"\nCuenta encontrada: {value}")
-            if p.lower() == "si":
-                usersref.child(key).delete()
-                print("\n¡Cuenta eliminada exitosamente!")
-                success = True
-                return True
-            else:
-                print("\nOperación cancelada.")
-                return False
-    if success == False:
-        print("\nNo se encontró ninguna cuenta con el identificador proporcionado.")
-        return False
+        if  cont == 5:
+            return list_top5
+        
+
+def deleteaccount(x):
+    usersref.child(x).delete()
+            
 def comprobaciónmod(x,z):       
     usersdata = usersref.get()
     correct = False
@@ -150,25 +176,33 @@ def modifyuser(x,y,z):
         else:
             usersref.child(y).update({"Nombre de Usuario" : z})    
             return 2
-def modifyemail(x,z):
-    usersdata = usersref.get()
-    if usersdata is None:
-        usersdata = {}
-    for key,i in usersdata.items():
-        if(i["Contraseña"] == z and (i["Nombre de Usuario"] == x or i["Correo Electrónico"] == x)):
-            newemail = str(input("Ingrese  nuevo correo: "))
-            usersref.child(key).update({"Correo Electrónico" : newemail})   
-            print("El cambio ha sido regristrado correctamente")
-            break
-def modifypassword(x,z):
-    usersdata = usersref.get()
-    if usersdata is None:
-        usersdata = {}
-    for key,i in usersdata.items():
-        if(i["Contraseña"] == z and (i["Nombre de Usuario"] == x or i["Correo Electrónico"] == x)):
-            newpassword = str(input("Ingrese  nueva contraseña: "))
-            usersref.child(key).update({"Contraseña" : newpassword})   
-            print("El cambio ha sido regristrado correctamente")
+        
+def modifyemail(x,y,z):
+    if x == True:
+        existing_users = usersref.get()
+        duplicadoname = False
+        if existing_users is None:
+            existing_users = {}
+        for u in existing_users.values():
+            if u['Correo Electrónico'] == z:
+                duplicadoname = True 
+        if duplicadoname:
+            return 1
         else:
-            print("La contraseña no fue escrita correctamente")
-        break
+            usersref.child(y).update({"Correo Electrónico" : z})    
+            return 2
+        
+def modifypassword(x,y,z):
+    if x == True:
+        existing_users = usersref.get()
+        duplicadoname = False
+        if existing_users is None:
+            existing_users = {}
+        for u in existing_users.values():
+            if u['Contraseña'] == z:
+                duplicadoname = True 
+        if duplicadoname:
+            return 1
+        else:
+            usersref.child(y).update({"Contraseña" : z})    
+            return 2
