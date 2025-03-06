@@ -139,6 +139,11 @@ def topleaderboard():
     list_top.sort(key = lambda x: x[1],reverse=True)
     cont = 0
     list_top5 = []
+    while True:
+        if len(list_top) <= 5:
+            list_top.append(["---","0","0","0","0"])
+        elif len(list_top) > 5:
+            break
     while cont < len(list_top):
         list_top5.append(list_top[cont])
         cont += 1
